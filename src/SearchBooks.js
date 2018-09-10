@@ -34,6 +34,7 @@ class SearchBooks extends Component {
 
             BooksAPI.search(query, 20).then(books => {
                 if(!books.error) {
+                    books.map(book => book.shelf = "none")
                     books.map(book => (this.props.booksShelved.filter((b) => b.id === book.id).map(b => book.shelf = b.shelf)))
                     this.setState({ books })
                 } else {

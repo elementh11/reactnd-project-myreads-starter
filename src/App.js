@@ -1,27 +1,26 @@
 import React, { Component } from 'react'
 import { Route } from 'react-router-dom'
+import ListBooks from './ListBooks'
+import AddBooks from './AddBooks'
+import './App.css'
 import * as BooksAPI from './BooksAPI'
 
-import ListBooks from './ListBooks'
-import SearchBooks from './SearchBooks'
-import './App.css'
-
-class BooksApp extends Component {
+class App extends Component {
+  //set the initial state to an empty array
   state = {
     books: []
   }
 
+  //use componentDidMount() lifecycle event to retrieve the books
+  //then update the state
   componentDidMount() {
-    this.getAllBooks()
-  }
-
-  getAllBooks = () => {
     BooksAPI.getAll().then((books) => {
-        this.setState({ books });
+      this.setState({ books })
     })
   }
 
-  handleBookChange  = (event, book) => {
+  //define a method to update the state on shelf changes
+  updateShelf  = (event, book) => {
       const shelf = event.target.value
 
       if (this.state.books) {
@@ -34,19 +33,21 @@ class BooksApp extends Component {
       }
   }
 
+  //render the ListBooks component or AddBooks component
+  //depending on the URL using the React Route component
   render() {
     return (
       <div className="app">
         <Route exact path="/" render={() => (
-            <ListBooks books={this.state.books} handleBookChange={this.handleBookChange}/>
+            <ListBooks books={this.state.books} updateShelf={this.updateShelf}/>
         )}/>
 
-        <Route path="/search" render={( {history} ) => (
-            <SearchBooks booksShelved={this.state.books} handleBookChange={this.handleBookChange} />
+        <Route path="/add" render={( {history} ) => (
+            <AddBooks currentlySelected={this.state.books} updateShelf={this.updateShelf} />
         )}/>
       </div>
     )
   }
 }
 
-export default BooksApp
+export default App

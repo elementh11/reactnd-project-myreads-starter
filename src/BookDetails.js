@@ -1,14 +1,9 @@
-import React, {Component} from 'react'
-import PropTypes from 'prop-types'
+import React from 'react'
 
-class BookDetails extends Component {
-    static propTypes = {
-        book: PropTypes.object.isRequired,
-        handleBookChange: PropTypes.func.isRequired
-    }
-
-    render() {
-        const {book, handleBookChange} = this.props
+//this functional component returns the book details
+//a ternary expression is used to deal with the case when imageLinks is missing
+function BookDetails(props) {
+        const {book, updateShelf} = props
 
         return (
             <li key={book.id}>
@@ -16,7 +11,7 @@ class BookDetails extends Component {
                     <div className="book-top">
                         <div className="book-cover" style={{width: 128, height: 192, backgroundImage: `url(${book.imageLinks ? book.imageLinks.thumbnail : null})` }}></div>
                         <div className="book-shelf-changer">
-                            <select defaultValue={book.shelf} onChange={(event) => handleBookChange(event, book)}>
+                            <select defaultValue={book.shelf} onChange={(event) => updateShelf(event, book)}>
                                 <option value="move" disabled>Move to...</option>
                                 <option value="currentlyReading">Currently Reading</option>
                                 <option value="wantToRead">Want to Read</option>
@@ -30,7 +25,6 @@ class BookDetails extends Component {
                 </div>
             </li>
         )
-    }
 }
 
 export default BookDetails

@@ -1,16 +1,15 @@
 import React, {Component} from 'react'
-import escapeRegExp from 'escape-string-regexp'
 import { Link } from 'react-router-dom'
 import PropTypes from 'prop-types'
 import * as BooksAPI from './BooksAPI'
 
 import BookDetails from './BookDetails'
 
-class SearchBooks extends Component {
+class AddBooks extends Component {
 
     static propTypes = {
-        booksShelved: PropTypes.array,
-        handleBookChange: PropTypes.func.isRequired
+        currentlySelected: PropTypes.array,
+        updateShelf: PropTypes.func.isRequired
     }
 
     state = {
@@ -18,6 +17,8 @@ class SearchBooks extends Component {
         books: []
     }
 
+    //updateQuery and clearQuery methods are defined similar to the contact app in the course
+    //to update the component state depending on the query
     updateQuery = (query) => {
         this.setState({ query: query.trim() })
     }
@@ -26,7 +27,8 @@ class SearchBooks extends Component {
         this.setState({ query: '', books: []})
     }
 
-    handleBookSearch = (query) => {
+    //searchBooks method updates the books array with their shelf ("none" or currently selected)
+    searchBooks = (query) => {
         if(!query) {
             this.clearQuery(query)
         } else {
@@ -35,7 +37,7 @@ class SearchBooks extends Component {
             BooksAPI.search(query, 20).then(books => {
                 if(!books.error) {
                     books.map(book => book.shelf = "none")
-                    books.map(book => (this.props.booksShelved.filter((b) => b.id === book.id).map(b => book.shelf = b.shelf)))
+                    books.map(book => (this.props.currentlySelected.filter((bk) => bk.id === book.id).map(b => book.shelf = b.shelf)))
                     this.setState({ books })
                 } else {
                     console.log(books.error)
@@ -45,16 +47,8 @@ class SearchBooks extends Component {
     }
 
     render() {
-        const { handleBookChange } = this.props
+        const { updateShelf } = this.props
         const { query, books } = this.state;
-        let bookSearchResult
-
-        if (query) {
-            const match = new RegExp(escapeRegExp(query), 'i')
-            bookSearchResult = books.filter(book => match.test(book.title))
-        } else {
-            bookSearchResult = books
-        }
 
         return (
             <div className="search-books">
@@ -66,21 +60,16 @@ class SearchBooks extends Component {
                             autoFocus
                             placeholder="Search by title or author"
                             value={query}
-                            onChange={(event) => this.handleBookSearch(event.target.value)}
+                            onChange={(event) => this.searchBooks(event.target.value)}
                         />
                     </div>
                 </div>
                 <div className="search-books-results">
 
-                    {bookSearchResult.length !== 0 && (
-                        <div className="showing-books">
-                            <span><b>{bookSearchResult.length}</b> results found for: <b>{query}</b></span>
-                        </div>
-                    )}
                     <ol className="books-grid">
-                        { bookSearchResult.map((book) => {
+                        { books.map((book) => {
                             return (
-                                <BookDetails key={book.id} book={book} handleBookChange={handleBookChange} />
+                                <BookDetails key={book.id} book={book} updateShelf={updateShelf} />
                             )
                         })
                         }
@@ -91,4 +80,4 @@ class SearchBooks extends Component {
     }
 }
 
-export default SearchBooks
+export default AddBooks
